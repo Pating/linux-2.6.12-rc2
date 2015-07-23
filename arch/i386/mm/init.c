@@ -43,6 +43,10 @@
 unsigned int __VMALLOC_RESERVE = 128 << 20;
 
 DEFINE_PER_CPU(struct mmu_gather, mmu_gathers);
+/*
+ * highstart_pfn: 第一个不能直接映射页帧的页帧号
+ * hignend_pfn: 最后一个不能直接映射页帧的页帧号
+ */
 unsigned long highstart_pfn, highend_pfn;
 
 static int noinline do_test_wp_bit(void);

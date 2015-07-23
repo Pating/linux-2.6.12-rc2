@@ -56,6 +56,9 @@
 /* This value is set up by the early boot code to point to the value
    immediately after the boot time page tables.  It contains a *physical*
    address, and must not be in the .bss segment! */
+/*
+ * init_pg_tables_end在"early boot"阶段初始化，它的值紧临启动时的临时页表
+ */
 unsigned long init_pg_tables_end __initdata = ~0UL;
 
 int disable_pse __initdata = 0;

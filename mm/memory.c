@@ -67,6 +67,9 @@ EXPORT_SYMBOL(max_mapnr);
 EXPORT_SYMBOL(mem_map);
 #endif
 
+/*
+ * 最高可用页帧的页帧号,参考函数set_max_mapnr_init()
+ */
 unsigned long num_physpages;
 /*
  * A number of key systems in x86 including ioremap() rely on the assumption

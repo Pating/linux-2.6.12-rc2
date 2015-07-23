@@ -88,6 +88,9 @@ ENTRY(startup_32)
  * Warning: don't use %esi or the stack in this code.  However, %esp
  * can be used as a GPR if you really need it...
  */
+/*
+ * _end | 页目录项 | 页表 | init_pg_tables_end
+ */
 page_pde_offset = (__PAGE_OFFSET >> 20);
 
 	movl $(pg0 - __PAGE_OFFSET), %edi
@@ -440,6 +443,9 @@ int_msg:
 
 .globl boot_gdt_descr
 .globl idt_descr
+/*
+ * cpu_gdt_descr存放了所有GDT的地址和它们的大小
+ */
 .globl cpu_gdt_descr
 
 	ALIGN
@@ -483,6 +489,11 @@ ENTRY(cpu_gdt_table)
 	.quad 0x0000000000000000	/* 0x1b reserved */
 	.quad 0x0000000000000000	/* 0x20 unused */
 	.quad 0x0000000000000000	/* 0x28 unused */
+
+	/*
+	 * 3个局部线程存储段：这种机制允许多线程应用程序使用最多3个局部于线程的数据段
+	 * sys_set_thread_area sys_get_thread_area
+	 */
 	.quad 0x0000000000000000	/* 0x33 TLS entry 1 */
 	.quad 0x0000000000000000	/* 0x3b TLS entry 2 */
 	.quad 0x0000000000000000	/* 0x43 TLS entry 3 */
@@ -490,15 +501,30 @@ ENTRY(cpu_gdt_table)
 	.quad 0x0000000000000000	/* 0x53 reserved */
 	.quad 0x0000000000000000	/* 0x5b reserved */
 
+	/* 		Base		G	Limit	S	Type	DPL	D/B	P
+	 * 用户代码段	0x00000000	1	0xffff	1	10	3	1	1
+	 * 用户数据段	0x00000000	1	0xffff	1	2	3	1	1
+	 * 内核代码段	0x00000000	1	0xffff	1	10	0	1	1
+	 * 内核数据段	0x00000000	1	0xffff	1	2	0	1	1
+	 *
+	 * 所有段Base都从0x00000000开始，可以得出结论: linux下逻辑地址与线性地址是一致的，即
+	 * 逻辑地址的偏移量字段的值与相应的线性地址的值总是一致的。
+	 */
 	.quad 0x00cf9a000000ffff	/* 0x60 kernel 4GB code at 0x00000000 */
 	.quad 0x00cf92000000ffff	/* 0x68 kernel 4GB data at 0x00000000 */
 	.quad 0x00cffa000000ffff	/* 0x73 user 4GB code at 0x00000000 */
 	.quad 0x00cff2000000ffff	/* 0x7b user 4GB data at 0x00000000 */
 
+	/*
+	 * 每个处理器一个TSS段
+	 */
 	.quad 0x0000000000000000	/* 0x80 TSS descriptor */
 	.quad 0x0000000000000000	/* 0x88 LDT descriptor */
 
 	/* Segments used for calling PnP BIOS */
+	/*
+	 * 支持即插即用(PnP)功能的BIOS服务程序相关的段
+	 */
 	.quad 0x00c09a0000000000	/* 0x90 32-bit code */
 	.quad 0x00809a0000000000	/* 0x98 16-bit code */
 	.quad 0x0080920000000000	/* 0xa0 16-bit data */
@@ -507,6 +533,8 @@ ENTRY(cpu_gdt_table)
 	/*
 	 * The APM segments have byte granularity and their bases
 	 * and limits are set at run time.
+	 * 与高级电源管理(APM)相关的3个段: linux APM驱动调用BIOS函数来获取或者设置APM设备状态时，就
+	 * 可以使用这些自定义的代码段和数据段
 	 */
 	.quad 0x00409a0000000000	/* 0xb8 APM CS    code */
 	.quad 0x00009a0000000000	/* 0xc0 APM CS 16 code (16 bit) */
@@ -517,5 +545,8 @@ ENTRY(cpu_gdt_table)
 	.quad 0x0000000000000000	/* 0xe0 - unused */
 	.quad 0x0000000000000000	/* 0xe8 - unused */
 	.quad 0x0000000000000000	/* 0xf0 - unused */
+	/*
+	 * 处理“双重错误”(处理一个异常时引发另一个异常)异常的特殊tss段
+	 */
 	.quad 0x0000000000000000	/* 0xf8 - GDT entry 31: double-fault TSS */
 

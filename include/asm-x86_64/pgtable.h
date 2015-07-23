@@ -316,6 +316,9 @@ static inline int pmd_large(pmd_t pte) {
 /* PUD - Level3 access */
 /* to find an entry in a page-table-directory. */
 #define pud_index(address) (((address) >> PUD_SHIFT) & (PTRS_PER_PUD-1))
+/*
+ * 产生页上级目录中目录项addr对应的线性地址
+ */
 #define pud_offset(pgd, address) ((pud_t *) pgd_page(*(pgd)) + pud_index(address))
 #define pud_offset_k(pgd, addr) pud_offset(pgd, addr)
 #define pud_present(pud) (pud_val(pud) & _PAGE_PRESENT)

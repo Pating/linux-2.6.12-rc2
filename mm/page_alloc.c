@@ -45,7 +45,13 @@
 nodemask_t node_online_map = { { [0] = 1UL } };
 nodemask_t node_possible_map = NODE_MASK_ALL;
 struct pglist_data *pgdat_list;
+/*
+ * 系统所有可用页帧的总数量
+ */
 unsigned long totalram_pages;
+/*
+ * ZONE_HIGHMEM区域(高端内存)中不能直接映射页的页帧总数
+ */
 unsigned long totalhigh_pages;
 long nr_swap_pages;
 

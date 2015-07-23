@@ -206,6 +206,12 @@ extern unsigned long pg0[];
 #define pmd_none(x)	(!pmd_val(x))
 #define pmd_present(x)	(pmd_val(x) & _PAGE_PRESENT)
 #define pmd_clear(xp)	do { set_pmd(xp, __pmd(0)); } while (0)
+/*
+ * 如果目录项指向一个不能使用的也表，即满足下面任一条件，pmd_bad返回1
+ * 1. 页不在主存中(Present标志被清除)
+ * 2. 页只允许读访问(Read/Write标志被清除)
+ * 3. Acessed或Dirty位被清除
+ */
 #define	pmd_bad(x)	((pmd_val(x) & (~PAGE_MASK & ~_PAGE_USER)) != _KERNPG_TABLE)
 
 
@@ -223,6 +229,9 @@ static inline int pte_write(pte_t pte)		{ return (pte).pte_low & _PAGE_RW; }
 
 /*
  * The following only works if pte_present() is not true.
+ */
+/*
+ * 读Dirty标志(当Present标志被清除而Dirty标志被设置时,页属于一个非线性磁盘文件映射)
  */
 static inline int pte_file(pte_t pte)		{ return (pte).pte_low & _PAGE_FILE; }
 
@@ -295,6 +304,9 @@ static inline pte_t pte_modify(pte_t pte, pgprot_t newprot)
 
 #define page_pte(page) page_pte_prot(page, __pgprot(0))
 
+/*
+ * 如果页中间目录项pmd指向一个大型页(2MB/4MB), pmd_large返回1, 否则返回0
+ */
 #define pmd_large(pmd) \
 ((pmd_val(pmd) & (_PAGE_PSE|_PAGE_PRESENT)) == (_PAGE_PSE|_PAGE_PRESENT))
 
@@ -304,6 +316,9 @@ static inline pte_t pte_modify(pte_t pte, pgprot_t newprot)
  * this macro returns the index of the entry in the pgd page which would
  * control the given virtual address
  */
+/*
+ * 线性地址addr对应的目录项在页全局目录中的索引
+ */
 #define pgd_index(address) (((address) >> PGDIR_SHIFT) & (PTRS_PER_PGD-1))
 #define pgd_index_k(addr) pgd_index(addr)
 
@@ -311,11 +326,17 @@ static inline pte_t pte_modify(pte_t pte, pgprot_t newprot)
  * pgd_offset() returns a (pgd_t *)
  * pgd_index() is used get the offset into the pgd page's array of pgd_t's;
  */
+/*
+ * addr在页全局目录中相应表项的线性地址
+ */
 #define pgd_offset(mm, address) ((mm)->pgd+pgd_index(address))
 
 /*
  * a shortcut which implies the use of the kernel's pgd, instead
  * of a process's
+ */
+/*
+ * addr在主内核页全局目录中相应表项的线性地址
  */
 #define pgd_offset_k(address) pgd_offset(&init_mm, address)
 

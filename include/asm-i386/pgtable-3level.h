@@ -59,6 +59,9 @@ static inline void set_pte(pte_t *ptep, pte_t pte)
 #define set_pte_at(mm,addr,ptep,pteval) set_pte(ptep,pteval)
 
 #define __HAVE_ARCH_SET_PTE_ATOMIC
+/*
+ * set_pte_atomic与set_pte作用相同，但是当PAE被激活时它能保证64位的值被原子地写入
+ */
 #define set_pte_atomic(pteptr,pteval) \
 		set_64bit((unsigned long long *)(pteptr),pte_val(pteval))
 #define set_pmd(pmdptr,pmdval) \
@@ -79,6 +82,9 @@ static inline void pud_clear (pud_t * pud) { }
 #define pmd_page_kernel(pmd) \
 ((unsigned long) __va(pmd_val(pmd) & PAGE_MASK))
 
+/*
+ * 通过页上级目录项pud产生相应的页中间目录的线性地址
+ */
 #define pud_page(pud) \
 ((struct page *) __va(pud_val(pud) & PAGE_MASK))
 
@@ -90,6 +96,9 @@ static inline void pud_clear (pud_t * pud) { }
 #define pmd_offset(pud, address) ((pmd_t *) pud_page(*(pud)) + \
 			pmd_index(address))
 
+/*
+ * 清除一个表项并返回前一个值
+ */
 static inline pte_t ptep_get_and_clear(struct mm_struct *mm, unsigned long addr, pte_t *ptep)
 {
 	pte_t res;

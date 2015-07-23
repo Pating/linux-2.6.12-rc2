@@ -18,6 +18,10 @@
 
 #include "cpu.h"
 
+/*
+ * 单处理器系统只有一个GDT，多处理器系统每个CPU对应一个GDT，所有的GDT
+ * 都存放在cpu_gdt_table数组中
+ */
 DEFINE_PER_CPU(struct desc_struct, cpu_gdt_table[GDT_ENTRIES]);
 EXPORT_PER_CPU_SYMBOL(cpu_gdt_table);
 

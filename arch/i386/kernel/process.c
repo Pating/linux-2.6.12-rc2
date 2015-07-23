@@ -744,6 +744,7 @@ static int get_free_idx(void)
 
 /*
  * Set a given TLS descriptor:
+ * 创建TLS段
  */
 asmlinkage int sys_set_thread_area(struct user_desc __user *u_info)
 {
@@ -812,6 +813,9 @@ asmlinkage int sys_set_thread_area(struct user_desc __user *u_info)
 #define GET_PRESENT(desc)	(((desc)->b >> 15) & 1)
 #define GET_USEABLE(desc)	(((desc)->b >> 20) & 1)
 
+/*
+ * 撤销TLS段
+ */
 asmlinkage int sys_get_thread_area(struct user_desc __user *u_info)
 {
 	struct user_desc info;

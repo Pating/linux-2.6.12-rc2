@@ -2,10 +2,21 @@
 #define _I386_PAGE_H
 
 /* PAGE_SHIFT determines the page size */
+/*
+ *---------------------------------------------------------
+ * | GLOBAL_DIR | UPPER DIR | MIDDLE DIR | TABLE | OFFSET |
+ *---------------------------------------------------------
+ * PAGE_SHIFT指定OFFSET字段的位数
+ * PAGE_SIZE 4K
+ * PAGE_MASK 0xfffff000
+ */
 #define PAGE_SHIFT	12
 #define PAGE_SIZE	(1UL << PAGE_SHIFT)
 #define PAGE_MASK	(~(PAGE_SIZE-1))
 
+/*
+ * 大型页不使用最后一级页表(TABLE字段)
+ */
 #define LARGE_PAGE_MASK (~(LARGE_PAGE_SIZE-1))
 #define LARGE_PAGE_SIZE (1UL << PMD_SHIFT)
 
@@ -45,6 +56,11 @@
 extern int nx_enabled;
 #ifdef CONFIG_X86_PAE
 extern unsigned long long __supported_pte_mask;
+/*
+ * pte_t, pmd_t, pud_t, pgd_t分别描述页表项，页中间目录项，页上级目录项，页全局目录项的格式
+ * PAE禁止 都是32位数据类型
+ * PAE使能 都是64位数据类型
+ */
 typedef struct { unsigned long pte_low, pte_high; } pte_t;
 typedef struct { unsigned long long pmd; } pmd_t;
 typedef struct { unsigned long long pgd; } pgd_t;
@@ -73,6 +89,10 @@ typedef struct { unsigned long pgprot; } pgprot_t;
 #define pgd_val(x)	((x).pgd)
 #define pgprot_val(x)	((x).pgprot)
 
+/*
+ * __pte, __pmd, __pud, __pgd, __pgprot 把一个无符号整数转换成所需类型
+ * pte_val, pmd_val, pud_val, pgd_val, pgprot_val 把所需类型转化成无符号整数
+ */
 #define __pte(x) ((pte_t) { (x) } )
 #define __pgd(x) ((pgd_t) { (x) } )
 #define __pgprot(x)	((pgprot_t) { (x) } )

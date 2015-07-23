@@ -25,8 +25,17 @@
  * Access to this subsystem has to be serialized externally. (this is
  * true for the boot process anyway)
  */
+/*
+ * ZONE_NORMAL区域(低端内存)内可直接映射页帧的页帧号
+ */
 unsigned long max_low_pfn;
+/*
+ * 启动临时页表后的第一个可用页帧的页帧号
+ */
 unsigned long min_low_pfn;
+/*
+ * 最高可用页帧的页帧号(通过find_max_pfn查询e820获得)
+ */
 unsigned long max_pfn;
 
 EXPORT_SYMBOL(max_pfn);		/* This is exported so

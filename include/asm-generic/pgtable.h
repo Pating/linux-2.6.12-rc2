@@ -120,6 +120,9 @@ static inline void ptep_set_wrprotect(struct mm_struct *mm, unsigned long addres
 #endif
 
 #ifndef __HAVE_ARCH_PTE_SAME
+/*
+ * 如果A，B两个页表项指向同一页并且指定相同的访问优先级，那么pte_same（a, b）返回1, 否则返回0
+ */
 #define pte_same(A,B)	(pte_val(A) == pte_val(B))
 #endif
 

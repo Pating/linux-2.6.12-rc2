@@ -2,6 +2,9 @@
 #define _I386_PGTABLE_3LEVEL_DEFS_H
 
 /*
+ * i386 PAE开启的时使用3级页表
+ */
+/*
  * PGDIR_SHIFT determines what a top-level page table entry can map
  */
 #define PGDIR_SHIFT	30

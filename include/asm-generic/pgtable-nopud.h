@@ -12,6 +12,9 @@
  */
 typedef struct { pgd_t pgd; } pud_t;
 
+/*
+ * PUD_SHIFT与PGDIR_SHIFT等价
+ */
 #define PUD_SHIFT	PGDIR_SHIFT
 #define PTRS_PER_PUD	1
 #define PUD_SIZE  	(1UL << PUD_SHIFT)
@@ -43,6 +46,10 @@ static inline pud_t * pud_offset(pgd_t * pgd, unsigned long address)
 #define pud_val(x)				(pgd_val((x).pgd))
 #define __pud(x)				((pud_t) { __pgd(x) } )
 
+/*
+ * 通过全局目录项pgd产生页上级目录所在页框的页描述符地址,
+ * 在两级或三级分页系统中，pgd_page等价于pud_page
+ */
 #define pgd_page(pgd)				(pud_page((pud_t){ pgd }))
 #define pgd_page_kernel(pgd)			(pud_page_kernel((pud_t){ pgd }))
 

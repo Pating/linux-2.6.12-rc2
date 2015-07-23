@@ -58,6 +58,9 @@
 
 asmlinkage int system_call(void);
 
+/*
+ * 内核定义的缺省的LDT数组，包含5项，供大多数进程共享
+ */
 struct desc_struct default_ldt[] = { { 0, 0 }, { 0, 0 }, { 0, 0 },
 		{ 0, 0 }, { 0, 0 } };
 

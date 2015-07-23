@@ -14,6 +14,16 @@
  */
 typedef struct { pud_t pud; } pmd_t;
 
+/*
+ *---------------------------------------------------------
+ * | GLOBAL_DIR | UPPER DIR | MIDDLE DIR | TABLE | OFFSET |
+ *---------------------------------------------------------
+ * PMD_SHIFT指定(TABLE + OFFSET)字段的位数
+ * PMD_SIZE为页中间目录的一个单独表项所映射区域的大小
+ * PAGE_MASK用于屏蔽(TABLE + OFFSET)字段的所有位
+ * 当PAE被禁用时: PMD_SHIFT= 10 + 12= 22
+ * 当PAE被激活时: PMD_SHIFT= 9 + 12= 21
+ */
 #define PMD_SHIFT	PUD_SHIFT
 #define PTRS_PER_PMD	1
 #define PMD_SIZE  	(1UL << PMD_SHIFT)

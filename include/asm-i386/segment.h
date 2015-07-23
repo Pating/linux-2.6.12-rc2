@@ -51,6 +51,10 @@
 
 #define TLS_SIZE (GDT_ENTRY_TLS_ENTRIES * 8)
 
+/*
+ * __USER_CS __USER_DS __KERNEL_CS __KERNEL_DS 分别指定了相应的段选择符权限以及其在GDT中的位置
+ */
+
 #define GDT_ENTRY_DEFAULT_USER_CS	14
 #define __USER_CS (GDT_ENTRY_DEFAULT_USER_CS * 8 + 3)
 

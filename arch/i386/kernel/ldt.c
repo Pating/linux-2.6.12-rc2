@@ -233,6 +233,9 @@ out:
 	return error;
 }
 
+/*
+ * 进程创建自己的局部描述符表, 如:wine
+ */
 asmlinkage int sys_modify_ldt(int func, void __user *ptr, unsigned long bytecount)
 {
 	int ret = -ENOSYS;
