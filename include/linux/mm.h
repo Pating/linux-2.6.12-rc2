@@ -222,13 +222,26 @@ typedef unsigned long page_flags_t;
  * a page.
  */
 struct page {
+	/*
+	 * 一组标志, 也对页框所在的管理区进行编号
+	 */
 	page_flags_t flags;		/* Atomic flags, some possibly
 					 * updated asynchronously */
+	/*
+	 * 页框的引用计数
+	 */
 	atomic_t _count;		/* Usage count, see below. */
+	/*
+	 * 页框中的页表项数目(如果没有则为-1)
+	 */
 	atomic_t _mapcount;		/* Count of ptes mapped in mms,
 					 * to show when page is mapped
 					 * & limit reverse map searches.
 					 */
+	/*
+	 * 可用于正在使用页的内核成分(例如, 在缓冲页的情况下它是一个缓冲器头指针)
+	 * . 如果页是空闲的，则该字段由伙伴系统使用
+	 */
 	unsigned long private;		/* Mapping-private opaque data:
 					 * usually used for buffer_heads
 					 * if PagePrivate set; used for
@@ -236,6 +249,9 @@ struct page {
 					 * When page is free, this indicates
 					 * order in the buddy system.
 					 */
+	/*
+	 * 当页被插入页高速缓存中时使用，或者当页属于匿名区时使用
+	 */
 	struct address_space *mapping;	/* If low bit clear, points to
 					 * inode address_space, or NULL.
 					 * If page mapped as anonymous
@@ -243,7 +259,14 @@ struct page {
 					 * it points to anon_vma object:
 					 * see PAGE_MAPPING_ANON below.
 					 */
+	/*
+	 * 它在页磁盘映像或匿名区中标识存放在页框中的数据位置, 或者它存放
+	 * 一个换出页标识符
+	 */
 	pgoff_t index;			/* Our offset within mapping. */
+	/*
+	 * 包含页的最近最少使用(LRU)双向链表的指针
+	 */
 	struct list_head lru;		/* Pageout list, eg. active_list
 					 * protected by zone->lru_lock !
 					 */
@@ -332,6 +355,9 @@ void put_page(struct page *page);
 
 #else		/* CONFIG_HUGETLB_PAGE */
 
+/*
+ * 返回该页的使用者数目
+ */
 #define page_count(p)		(atomic_read(&(p)->_count) + 1)
 
 static inline void get_page(struct page *page)

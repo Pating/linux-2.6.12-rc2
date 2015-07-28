@@ -89,7 +89,7 @@ ENTRY(startup_32)
  * can be used as a GPR if you really need it...
  */
 /*
- * _end | 页目录项 | 页表 | init_pg_tables_end
+ * _end | 页目录项(swapper_pg_dir) | 页表(pg0) | init_pg_tables_end
  */
 page_pde_offset = (__PAGE_OFFSET >> 20);
 
