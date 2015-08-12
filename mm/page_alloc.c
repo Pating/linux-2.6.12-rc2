@@ -44,6 +44,9 @@
  */
 nodemask_t node_online_map = { { [0] = 1UL } };
 nodemask_t node_possible_map = NODE_MASK_ALL;
+/*
+ * 用于存放系统中所有节点的单向链表
+ */
 struct pglist_data *pgdat_list;
 /*
  * 系统所有可用页帧的总数量
@@ -72,10 +75,16 @@ EXPORT_SYMBOL(nr_swap_pages);
  * Used by page_zone() to look up the address of the struct zone whose
  * id is encoded in the upper bits of page->flags
  */
+/*
+ * zone_table数组存放了所有内存节点的所有管理区描述符的地址
+ */
 struct zone *zone_table[1 << (ZONES_SHIFT + NODES_SHIFT)];
 EXPORT_SYMBOL(zone_table);
 
 static char *zone_names[MAX_NR_ZONES] = { "DMA", "Normal", "HighMem" };
+/*
+ * 内核为原子内存分配请求保留了一个页框池，只有在内存不足时使用。min_free_kbytes此页框池的大小
+ */
 int min_free_kbytes = 1024;
 
 unsigned long __initdata nr_kernel_pages;
@@ -917,6 +926,9 @@ EXPORT_SYMBOL(__alloc_pages);
 /*
  * Common helper functions.
  */
+/*
+ * 类似于alloc_pages(), 但它返回第一个所分配页的线性地址
+ */
 fastcall unsigned long __get_free_pages(unsigned int __nocast gfp_mask, unsigned int order)
 {
 	struct page * page;
@@ -928,6 +940,9 @@ fastcall unsigned long __get_free_pages(unsigned int __nocast gfp_mask, unsigned
 
 EXPORT_SYMBOL(__get_free_pages);
 
+/*
+ * 返回一个填满0的页框的线性地址
+ */
 fastcall unsigned long get_zeroed_page(unsigned int __nocast gfp_mask)
 {
 	struct page * page;
@@ -954,6 +969,9 @@ void __pagevec_free(struct pagevec *pvec)
 		free_hot_cold_page(pvec->pages[i], pvec->cold);
 }
 
+/*
+ * 释放从page对应的页框开始的2的order次方个连续页框
+ */
 fastcall void __free_pages(struct page *page, unsigned int order)
 {
 	if (!PageReserved(page) && put_page_testzero(page)) {

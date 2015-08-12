@@ -443,6 +443,9 @@ static inline unsigned long page_to_nid(struct page *page)
 struct zone;
 extern struct zone *zone_table[];
 
+/*
+ * 获得页所在管理区的描述符的地址
+ */
 static inline struct zone *page_zone(struct page *page)
 {
 	return zone_table[page->flags >> NODEZONE_SHIFT];

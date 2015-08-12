@@ -78,6 +78,9 @@ unsigned long num_physpages;
  * highstart_pfn must be the same; there must be no gap between ZONE_NORMAL
  * and ZONE_HIGHMEM.
  */
+/*
+ * high_memory为直接映射的物理内存末端或者高端内存的始端, 它被设置为896M(内存足够大)
+ */
 void * high_memory;
 unsigned long vmalloc_earlyreserve;
 

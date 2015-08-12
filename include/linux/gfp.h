@@ -12,7 +12,13 @@ struct vm_area_struct;
  * GFP bitmasks..
  */
 /* Zone modifiers in GFP_ZONEMASK (see linux/mmzone.h - low two bits) */
+/*
+ * 所请求的页框必须处于ZONE_DMA管理区. 等价于GFP_DMA
+ */
 #define __GFP_DMA	0x01
+/*
+ * 所请求的页框处于ZONE_HIGHMEM管理区
+ */
 #define __GFP_HIGHMEM	0x02
 
 /*
@@ -26,17 +32,53 @@ struct vm_area_struct;
  *
  * __GFP_NORETRY: The VM implementation must not retry indefinitely.
  */
+/*
+ * 允许内核对等待空闲页框的当前进程进行阻塞
+ */
 #define __GFP_WAIT	0x10u	/* Can wait and reschedule? */
+/*
+ * 允许内核访问保留的页框池
+ */
 #define __GFP_HIGH	0x20u	/* Should access emergency pools? */
+/*
+ * 允许内核在低端内存页上执行I/O传输以释放页框
+ */
 #define __GFP_IO	0x40u	/* Can start physical IO? */
+/*
+ * 如果清0，则不允许内核执行依赖于文件系统的操作
+ */
 #define __GFP_FS	0x80u	/* Can call down to low-level FS? */
+/*
+ * 所请求的页框可能为"冷的"
+ */
 #define __GFP_COLD	0x100u	/* Cache-cold page required */
+/*
+ * 内存分配失败将不会产生警告信息
+ */
 #define __GFP_NOWARN	0x200u	/* Suppress page allocation failure warning */
+/*
+ * 内核重试内存分配直到成功
+ */
 #define __GFP_REPEAT	0x400u	/* Retry the allocation.  Might fail */
+/*
+ * 与__GFP_REPEAT相同
+ */
 #define __GFP_NOFAIL	0x800u	/* Retry for ever.  Cannot fail */
+/*
+ * 一次内存分配失败后不再重试
+ */
 #define __GFP_NORETRY	0x1000u	/* Do not retry.  Might fail */
+/*
+ * slab分配器不允许增大slab高速缓存
+ */
 #define __GFP_NO_GROW	0x2000u	/* Slab internal usage */
+/*
+ * 属于扩展页的页框
+ */
 #define __GFP_COMP	0x4000u	/* Add compound page metadata */
+/*
+ * 任何返回的页框必须被填满0
+ */
 #define __GFP_ZERO	0x8000u	/* Return zeroed page on success */
 
 #define __GFP_BITS_SHIFT 16	/* Room for 16 __GFP_FOO bits */
@@ -106,18 +148,31 @@ alloc_pages(unsigned int __nocast gfp_mask, unsigned int order)
 extern struct page *alloc_page_vma(unsigned __nocast gfp_mask,
 			struct vm_area_struct *vma, unsigned long addr);
 #else
+/*
+ * 这个函数请求2的order次方个连续的页框. 它返回第一个所分配页框描述符的地址，或者如果
+ * 分配失败，则返回NULL
+ */
 #define alloc_pages(gfp_mask, order) \
 		alloc_pages_node(numa_node_id(), gfp_mask, order)
 #define alloc_page_vma(gfp_mask, vma, addr) alloc_pages(gfp_mask, 0)
 #endif
+/*
+ * 获得单独一个页框的宏
+ */
 #define alloc_page(gfp_mask) alloc_pages(gfp_mask, 0)
 
 extern unsigned long FASTCALL(__get_free_pages(unsigned int __nocast gfp_mask, unsigned int order));
 extern unsigned long FASTCALL(get_zeroed_page(unsigned int __nocast gfp_mask));
 
+/*
+ * 获得单独一个页框的线性地址
+ */
 #define __get_free_page(gfp_mask) \
 		__get_free_pages((gfp_mask),0)
 
+/*
+ * 获得适用于DMA的一个页框的线性地址
+ */
 #define __get_dma_pages(gfp_mask, order) \
 		__get_free_pages((gfp_mask) | GFP_DMA,(order))
 
@@ -126,7 +181,13 @@ extern void FASTCALL(free_pages(unsigned long addr, unsigned int order));
 extern void FASTCALL(free_hot_page(struct page *page));
 extern void FASTCALL(free_cold_page(struct page *page));
 
+/*
+ * 释放page所指描述符对应的页框
+ */
 #define __free_page(page) __free_pages((page), 0)
+/*
+ * 释放线性地址为addr的页框
+ */
 #define free_page(addr) free_pages((addr),0)
 
 void page_alloc_init(void);

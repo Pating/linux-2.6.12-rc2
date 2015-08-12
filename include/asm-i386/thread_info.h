@@ -25,6 +25,9 @@
  */
 #ifndef __ASSEMBLY__
 
+/*
+ * 线程描述符
+ */
 struct thread_info {
 	struct task_struct	*task;		/* main task structure */
 	struct exec_domain	*exec_domain;	/* execution domain */

@@ -159,18 +159,33 @@ static struct task_struct *dup_task_struct(struct task_struct *orig)
 
 	prepare_to_copy(orig);
 
+	/*
+	 * 为新进程获取进程描述符
+	 */
 	tsk = alloc_task_struct();
 	if (!tsk)
 		return NULL;
 
+	/*
+	 * 获取一片空闲区域4k或者8k, 用来存放新进程的thread_info结构和内核栈
+	 */
 	ti = alloc_thread_info(tsk);
 	if (!ti) {
 		free_task_struct(tsk);
 		return NULL;
 	}
 
+	/*
+	 * 将current进程描述符的内容复制到tsk所指向的task_struct结构中
+	 */
 	*ti = *orig->thread_info;
+	/*
+	 * 把current进程的thread_info描述符的内容复制到ti中
+	 */
 	*tsk = *orig;
+	/*
+	 * 下面两行将新进程的task_struct与thread_info绑定
+	 */
 	tsk->thread_info = ti;
 	ti->task = tsk;
 

@@ -857,6 +857,10 @@ void yield(void);
  */
 extern struct exec_domain	default_exec_domain;
 
+/*
+ * thread_union是进程的内核栈结构体,大小为4K或者8K.
+ * 进程内核栈的创建流程: do_fork -> copy_process -> dup_task_struct
+ */
 union thread_union {
 	struct thread_info thread_info;
 	unsigned long stack[THREAD_SIZE/sizeof(long)];
